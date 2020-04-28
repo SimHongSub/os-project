@@ -199,14 +199,12 @@ thread_create (const char *name, int priority,
   sf->eip = switch_entry;
   sf->ebp = 0;
 
-  /* SimHongsub : */
+  /* SimHongsub : Add code to save the child thread info in parrent thread*/
   struct thread* cur_thread = thread_current();
 
   ChildInfo* new_child_info = (ChildInfo*)malloc(sizeof(ChildInfo));
   new_child_info->next = NULL;
   new_child_info->tid = tid;
-
-  printf("cur thread name : %s\n", cur_thread->name);
 
   if(cur_thread->child_info == NULL){
     cur_thread->child_info = new_child_info;
@@ -658,7 +656,7 @@ allocate_tid (void)
   return tid;
 }
 
-/* SimHongsub :  */
+/* SimHongsub : function which return the child info linkedlist length */
 int num_of_child_thread(ChildInfo* child_info){
   int len = 0;
   ChildInfo* current = child_info;
@@ -687,7 +685,6 @@ void thread_join(tid_t tid){
   }
 
   if(check == 1){
-    printf("thread block possible\n");
     thread_sleep(1);
   }
 }

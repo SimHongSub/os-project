@@ -149,7 +149,7 @@ void thread_set_nice (int);
 int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
 
-/* SimHongsub : */
+/* SimHongsub : Add child thread linkedlist length return function*/
 int num_of_child_thread(ChildInfo* child_info);
 
 /* SimHongsub : Add thread_join function. */
