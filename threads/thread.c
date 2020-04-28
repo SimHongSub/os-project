@@ -11,6 +11,7 @@
 #include "threads/switch.h"
 #include "threads/synch.h"
 #include "threads/vaddr.h"
+#include "threads/malloc.h"
 #ifdef USERPROG
 #include "userprog/process.h"
 #endif
@@ -197,6 +198,27 @@ thread_create (const char *name, int priority,
   sf = alloc_frame (t, sizeof *sf);
   sf->eip = switch_entry;
   sf->ebp = 0;
+
+  /* SimHongsub : */
+  struct thread* cur_thread = thread_current();
+
+  ChildInfo* new_child_info = (ChildInfo*)malloc(sizeof(ChildInfo));
+  new_child_info->next = NULL;
+  new_child_info->tid = tid;
+
+  printf("cur thread name : %s\n", cur_thread->name);
+
+  if(cur_thread->child_info == NULL){
+    cur_thread->child_info = new_child_info;
+  }else{
+    ChildInfo* cur_child_info = cur_thread->child_info;
+
+    while(cur_child_info->next != NULL){
+      cur_child_info = cur_child_info->next;
+    }
+
+    cur_child_info->next = new_child_info;
+  }
 
   /* Add to run queue. */
   thread_unblock (t);
@@ -634,6 +656,40 @@ allocate_tid (void)
   lock_release (&tid_lock);
 
   return tid;
+}
+
+/* SimHongsub :  */
+int num_of_child_thread(ChildInfo* child_info){
+  int len = 0;
+  ChildInfo* current = child_info;
+
+  while(current != NULL){
+    len++;
+    current = current->next;
+  }
+
+  return len;
+}
+
+/* SimHongsub : thread join function. */
+void thread_join(tid_t tid){
+  struct thread* cur_thread = thread_current();
+  ChildInfo* current = cur_thread->child_info;
+  int check = 0;
+
+  for(int i=0; num_of_child_thread(cur_thread->child_info);i++){
+    if(current->tid == tid){
+      check = 1;
+      break;
+    }else{
+      current = current->next;
+    }
+  }
+
+  if(check == 1){
+    printf("thread block possible\n");
+    thread_sleep(1);
+  }
 }
 
 /* Offset of `stack' member within `struct thread'.

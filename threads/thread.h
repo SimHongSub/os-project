@@ -24,6 +24,12 @@ typedef int tid_t;
 #define PRI_DEFAULT 2                   /* Default priority. */
 #define PRI_MAX 4                       /* Highest priority. */
 
+/* SimHongsub : child thread info struct */
+typedef struct child_thread_info{
+   struct child_thread_info* next;
+   tid_t tid;
+}ChildInfo;
+
 /* A kernel thread or user process.
 
    Each thread structure is stored in its own 4 kB page.  The
@@ -103,6 +109,9 @@ struct thread
 
     /* Owned by thread.c. */
     unsigned magic;                     /* Detects stack overflow. */
+
+    /* SimHongsub : Add child thread info memory */
+    ChildInfo* child_info;
   };
 
 void thread_init (void);
@@ -139,5 +148,11 @@ int thread_get_nice (void);
 void thread_set_nice (int);
 int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
+
+/* SimHongsub : */
+int num_of_child_thread(ChildInfo* child_info);
+
+/* SimHongsub : Add thread_join function. */
+void thread_join(tid_t tid);
 
 #endif /* threads/thread.h */
